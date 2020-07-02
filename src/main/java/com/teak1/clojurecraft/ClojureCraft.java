@@ -1,8 +1,13 @@
 package com.teak1.clojurecraft;
 
+import com.teak1.clojurecraft.blocks.ClojureBlock;
 import com.teak1.clojurecraft.command.ClojureCommandLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -70,15 +75,28 @@ public class ClojureCraft
     // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
+
         @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // register a new block here
-            LOGGER.info("HELLO from Register Block");
+        public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
+            event.getRegistry().register(new ClojureBlock());
         }
+//        @SubscribeEvent
+//        public static void onTileEntityRegistry(final RegistryEvent.Register<TileEntityType<?>> event){
+//            event.getRegistry().register(TileEntityType.Builder.create(ClojureBlock::new, ModBlocks.CLOJURE_BLOCK).build(null).setRegistryName("clojure_block"));
+//        }
+
+        @SubscribeEvent
+        public static void onItemsRegistry(final RegistryEvent.Register<Item> event) {
+            Item.Properties properties = new Item.Properties();
+            event.getRegistry().register(new BlockItem(ModBlocks.CLOJURE_BLOCK, properties).setRegistryName("clojure_block"));
+        }
+
     }
 
     @SubscribeEvent
     public void serverLoad(FMLServerStartingEvent event){
+        ClojureCraft.API.setWorld(DimensionManager.getWorld(event.getServer(), DimensionType.OVERWORLD,false,false));
         ClojureCommandLoader.register(event.getCommandDispatcher());
     }
+    public static Api API = new Api();
 }
